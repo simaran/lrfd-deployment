@@ -1,0 +1,186 @@
+{% extends 'pmcircle/base.html' %}
+
+{% block content %}
+<div class="container">
+  <h5  class="head"align="center">P-M Diagram for Circular Columns</h5>
+
+  <p id="detail"align="center">(Based on AASTHO LRFD 8th Edition & ACI 318-14)   </p>
+  <h6 class="head mt-0 pt-0">Input Parameters:</h6>
+<div class="jumbo">
+  <div class="row">
+    <div class="col-md">
+      <form  >
+        <div class="form-group">
+          <label for=""  class="col-sm-10 head">Design Code</label>
+          <div class="col-sm-8">
+            <select class="form-control" id="code" align="right">
+              <option value="0">AASTHO LRFD</option>
+              <option value="1">ACI 318-14</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="di"  class="col-sm-10 head">Section diameter (in)</label>
+          <div class="col-sm-8">
+          <input id = "di"  class="form-control"type="float" min="0" oninput="validity.valid||(value='');" name="di" placeholder="dia (in)" value="30">
+        </div>
+        </div>
+        <div class="form-group">
+          <label  class="col-sm-10 head" for="rc">Concrete clear cover (in) <i class="fas fa-info-circle d-print-none" title="cover to tie/spirals"></i></label>
+          <div class="col-sm-8">
+          <input id = "rc" type="float" class="form-control" min="0" oninput="validity.valid||(value='');" name="rc" placeholder="cover (in)" value="3">
+        </div>
+        </div>
+        <div class="form-group">
+          <label  class="col-sm-10 head"for="nb">Number of bars <i class="fas fa-info-circle d-print-none" title="Min. 6 bars recommended"></i></label>
+          <div class="col-sm-8">
+          <input id = "nb" type="float" min="0" class="form-control pageCalc" oninput="validity.valid||(value='');" name="nb" value="6">
+        </div>
+        </div>
+        <div class="form-group">
+          <label  class="col-sm-10 head"for="">Transverse bar size</label>
+          <div class="col-sm-8">
+          <select  class="form-control" id="ts" align="right">
+            <option value="0">#3</option>
+            <option value="1" selected>#4</option>
+            <option value="2">#5</option>
+            <option value="3">#6</option>
+            <option value="4">#7</option>
+            <option value="5">#8</option>
+            <option value="6">#9</option>
+            <option value="7">#10</option>
+            <option value="8">#11</option>
+            <option value="9">#14</option>
+            <option value="10">#18</option>
+          </select>
+        </div>
+          </div>
+      </form>
+    </div>
+    <div class="col-md">
+      <form  class="">
+        <div class="form-group">
+          <label  class="col-sm-6 head"for="">Main Bar Size</label>
+          <div class="col-sm-8">
+          <select class="form-control"id="bs" align="right">
+            <option value="0">#3</option>
+            <option value="1">#4</option>
+            <option value="2">#5</option>
+            <option value="3">#6</option>
+            <option value="4">#7</option>
+            <option value="5">#8</option>
+            <option value="6" selected>#9</option>
+            <option value="7">#10</option>
+            <option value="8">#11</option>
+            <option value="9">#14</option>
+            <option value="10">#18</option>
+          </select>
+        </div>
+        </div>
+          <div class="form-group">
+            <label for="fc" class="col-sm-4 head">f'c (ksi)</label>
+            <div class="col-sm-8">
+            <input id = "fc"  class="form-control"type="float" min="0" oninput="validity.valid||(value='');" name="fc" value="4.0">
+          </div>
+          </div>
+          <div class="form-group">
+            <label for="fy" class="col-sm-4 head">fy (ksi)</label>
+            <div class="col-sm-8">
+            <input id = "fy" class="form-control" type="float" min="0" oninput="validity.valid||(value='');" name="fy" value="60">
+          </div>
+          </div>
+
+          <div class="form-group">
+            <label for="E" class="col-sm-4 head" >Es (ksi)</label>
+            <div class="col-sm-8">
+            <input id = "E" class="form-control" type="float" min="0" oninput="validity.valid||(value='');" name="E" value= "29000" >
+          </div>
+        </div>
+          <div class="form-group">
+            <label  for="" class="col-sm-10 head">Transverse reinforcement</label>
+            <div class="col-sm-8">
+            <select  class="form-control" id="tie" align="right">
+              <option value="0">Spiral</option>
+              <option value="1" selected>Tied/Other</option>
+            </select>
+          </div>
+          </div>
+      </form>
+    </div>
+    <div class="col-md my-auto" id="xSection">
+    </div>
+  </div>
+</div>
+
+<!-- <div class="" id="xSection"></div> -->
+
+<div id="" align="center" class="mt-2">
+<button id ="calculate" type="button" name="button" class="btn btn-primary scrollBot d-print-none" onclick="plotCirPM()">Plot P-M Curve</button>
+</div>
+<h6 class="text-capitalize pt-3 head ">Calculated Parameters :</h6>
+<div  class="container mt-2 border border-primary">
+  <!-- <h6 class="text-capitalize pt-3 head ">Calculated Parameters</h6> -->
+  <div id="one" class="row">
+  <div class="col-md-6">
+    <form >
+        <div class="form-group pt-2">
+          <p id="Ag">Gross sectional area, <strong>Ag = <span></span></strong></p>
+          <p id="Ig">Gross moment of inertia, <strong>Ig = <span></span></strong></p>
+        </div>
+    </form>
+  </div>
+
+  <div class="col-md-6">
+    <form>
+        <div class="form-group">
+          <strong><p id="beta"></p></strong>
+          <p id="As">Total steel area, <strong>As = <span></span></strong></p>
+        </div>
+    </form>
+  </div>
+ </div>
+</div>
+
+<div class="row">
+    <div class="pt-5 mx-auto mt-3" id="chart-area" style=""></div>
+  </div>
+
+
+<div class="">
+<div class="" id="inputLoad">
+  <h6 class="head mt-3 ">Plot (Pu, Mu) for different load cases in the above chart :</h6>
+  <!-- <div class="jumbo"> -->
+  <!-- <div class="row"> -->
+    <!-- <div class="col"> -->
+       <div class="">
+      <table class="table table-bordered table-sm table-hover table-striped">
+        <thead>
+          <tr id="tableHead02"class="head" >
+            <th scope="col-sm-2">Load Case</th>
+            <th scope="col-sm-3">Pu (kips)</th>
+            <th scope="col-sm-3">Mu (k-ft)</th>
+            <!-- <th scope="col-sm-1"><a href="javascript:void(0);"  id="addMore" title="Add Load Case"> <i class="fas fa-plus"></i></a></th> -->
+            <!-- <th scope="col-sm-1"></th> -->
+          </tr>
+        </thead>
+
+        <tbody id="userData">
+          <tr>
+            <td>1</td>
+            <td><input type="number" name="" value= "0.0" ></td>
+            <td><input type="number" name="" value= "0.0" ></td>
+            <!-- <td><a href='javascript:void(0);' title="Remove Load Case" class='remove'><i class="fas fa-times"></i></a></td> -->
+          </tr>
+        </tbody>
+      </table>
+
+       <div class="row">
+         <dt class="col-sm-4"><button type="button" name="button" class="btn btn-primary custom mt-2 scrollBot d-print-none" onclick="createLoadCase()">Add Load Case</button></dt>
+         <dc class="col-sm-4 max-auto"><button type="button" name="" class="btn btn-primary mt-2 custom d-print-none" onclick="plotLoadCase()">Plot</button></dc>
+         <dd class="col-sm-4 max-auto"><button type="button" name="" class="btn btn-warning custom mt-2 d-print-none" onclick="removeLoadCase()">Remove Load Case</button></dd>
+       </div>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
